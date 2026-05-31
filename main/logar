@@ -8,3 +8,15 @@ clean up:
 mainly use normal code:
 
 :code:
+// Cleaned, standard logging module
+const consoleModule = {
+    status: "active",
+    
+    // Standard logging method
+    log: function (message) {
+        console.log("Module: " + message);
+    }
+};
+
+// Triggering the module normally
+consoleModule.log(consoleModule.status);
