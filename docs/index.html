@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kahoot Bot Control Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Kahoot Bot Controller</h1>
+
+  <details open>
+    <summary>Core Configuration</summary>
+    <div class="content">
+      <label for="speed-input">Question Speed Delay (seconds):</label>
+      <input type="number" id="speed-input" value="10" min="0">
+    </div>
+  </details>
+
+  <details>
+    <summary>Bot Name Setup</summary>
+    <div class="content">
+      <label for="bot-name-list">Bot Names (One per line):</label>
+      <textarea id="bot-name-list" rows="8">Bot_Alpha
+Bot_Beta
+Bot_Gamma
+Bot_Delta</textarea>
+      
+      <div style="margin-top: 10px; display: flex; gap: 10px;">
+        <button onclick="random()">Shuffle Names</button>
+        <button onclick="inputNames()">Load Default Names</button>
+      </div>
+    </div>
+  </details>
+
+  <details open>
+    <summary>System Log Status</summary>
+    <div class="content">
+      <label for="status">Live Console Output:</label>
+      <textarea id="status" rows="6" readonly>System ready.</textarea>
+    </div>
+  </details>
+
+  <script>
+    const config = {
+      optionSetQuestionSpeed: 10
+    };
+
+    document.getElementById('speed-input').addEventListener('input', (e) => {
+      config.optionSetQuestionSpeed = parseInt(e.target.value) || 0;
+      status(`Speed configuration updated to: ${config.optionSetQuestionSpeed}s`);
+    });
+
+    function status(update) {
+      var currentStatus = "\n" + document.getElementById("status").innerHTML;
+      document.getElementById("status").innerHTML = update + currentStatus;
+    }
+
+    function random() {
+      var botNames = document.getElementById("bot-name-list").value.split("\n");
+      var shuffledNames = shuffle(botNames);
+      var output = "";
+      shuffledNames.forEach(function(currentName) {
+        if(currentName.trim() !== "") {
+          output += currentName + "\n";
+        }
+      });
+      document.getElementById("bot-name-list").value = output;
+      status("Bot name list randomized successfully.");
+    }
+
+    function inputNames() {
+      fetch("./names.txt")
+        .then(response => {
+          if (!response.ok) throw new Error('File not found');
+          return response.text();
+        })
+        .then(data => {
+          document.getElementById("bot-name-list").value = data;
+          status("Loaded names from names.txt successfully.");
+        })
+        .catch(err => {
+          status("Error: Could not load names.txt file locally.");
+        });
+    }
+
+    function shuffle(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex;
+      while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+      return array;
+    }
+
+    async function checkCurrentSpeed() {
+      const isCurrentSpeed = config.optionSetQuestionSpeed === 10;
+      status(`Checking execution limits... Active delay: ${config.optionSetQuestionSpeed}s`);
+      
+      if (isCurrentSpeed) {
+        status("Standard interval matched. Initializing sleep timer pipeline...");
+        await new Promise(resolve => setTimeout(resolve, config.optionSetQuestionSpeed * 1000));
+        status("Timer cycle finished processing sequence.");
+      }
+      return isCurrentSpeed;
+    }
+  </script>
+</body>
+</html>
