@@ -1,0 +1,13 @@
+(function() {
+    // 1. Assign the number 89 to your variable
+    var _0x56adx = 89;
+
+    // 2. Wrap the execution in a proper self-invoking function block
+    var _return = (function(_function_0x56adx) {
+        // Returns the value passed into it
+        return _function_0x56adx;
+    })(_0x56adx);
+
+    // 3. Output the result to verify it works
+    console.log(_return);
+})();
