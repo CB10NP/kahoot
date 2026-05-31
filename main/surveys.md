@@ -1,4 +1,4 @@
-<details>
-  <will you make a gui?>🕒 Click here 
-yes i will
+<question 1 >
+  <will you make a gui?>will you make a gui
+
 </details>
