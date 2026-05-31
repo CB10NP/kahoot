@@ -1,0 +1,110 @@
+/* Core Layout Settings */
+:root {
+  --primary-color: #4a90e2;
+  --bg-color: #f5f7fa;
+  --text-color: #333333;
+  --accent-color: #e06c75;
+  --border-radius: 8px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  margin: 0;
+  padding: 20px;
+}
+
+/* Dropdown Container (<details> Tag Styling) */
+details {
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: var(--border-radius);
+  margin-bottom: 15px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+details[open] {
+  border-color: var(--primary-color);
+}
+
+summary {
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+summary:hover {
+  color: var(--primary-color);
+}
+
+/* Inner Content Formatting */
+.content {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eeeeee;
+}
+
+/* Status & Code Display Blocks */
+pre, code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  background-color: #282c34;
+  color: #abb2bf;
+  border-radius: 4px;
+}
+
+code {
+  padding: 2px 6px;
+  font-size: 0.9em;
+}
+
+pre {
+  padding: 15px;
+  overflow-x: auto;
+}
+
+pre code {
+  padding: 0;
+  background-color: transparent;
+}
+
+/* Interactive Input Elements */
+textarea, select, input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #cccccc;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+/* Functional Buttons */
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #357abd;
+}
+
+button.danger {
+  background-color: var(--accent-color);
+}
