@@ -1,0 +1,18 @@
+import os
+
+# Enable ANSI escape sequences natively inside Windows/Linux terminals
+os.system("") 
+
+# Define clear, readable terminal colors
+class Style:
+    GREEN = '\033[32m'
+    RED = '\033[31m'
+    YELLOW = '\033[33m'
+    RESET = '\033[0m'
+
+# Shorten the class mapping safely without typos
+u = Style
+
+# Example of a clean, structured terminal output log
+print(f"{u.GREEN}[Module Loaded]{u.RESET} System active.")
+print(f"{u.YELLOW}[Warning]{u.RESET} Monitoring console connections...")
