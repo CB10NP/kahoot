@@ -1,0 +1,224 @@
+(function() {
+  // 1. Create and inject style tracking layout
+  const css = `
+    #kahoot-ui-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 320px;
+      background: #ffffff;
+      border: 2px solid #333333;
+      border-radius: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 999999;
+      color: #333333;
+      overflow: hidden;
+    }
+    #kahoot-ui-header {
+      background: #333333;
+      color: #ffffff;
+      padding: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      cursor: move;
+    }
+    .kahoot-ui-section {
+      padding: 12px;
+      border-bottom: 1px solid #eeeeee;
+    }
+    .kahoot-ui-section:last-child {
+      border-bottom: none;
+    }
+    .kahoot-ui-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .kahoot-ui-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .kahoot-ui-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      font-size: 12px;
+      resize: vertical;
+      font-family: monospace;
+    }
+    .kahoot-ui-btn-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .kahoot-ui-btn {
+      flex: 1;
+      background: #4a90e2;
+      color: white;
+      border: none;
+      padding: 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 12px;
+    }
+    .kahoot-ui-btn:hover {
+      background: #357abd;
+    }
+  `;
+
+  const styleNode = document.createElement('style');
+  styleNode.appendChild(document.createTextNode(css));
+  document.head.appendChild(styleNode);
+
+  // 2. Generate Core UI Elements
+  const uiContainer = document.createElement('div');
+  uiContainer.id = 'kahoot-ui-container';
+
+  uiContainer.innerHTML = `
+    <div id="kahoot-ui-header">Kahoot Controller</div>
+    
+    <div class="kahoot-ui-section">
+      <label class="kahoot-ui-label">Question Speed Delay (seconds)</label>
+      <input type="number" id="kh-speed-input" class="kahoot-ui-input" value="10" min="0">
+    </div>
+
+    <div class="kahoot-ui-section">
+      <label class="kahoot-ui-label">Bot Names</label>
+      <textarea id="kh-bot-list" class="kahoot-ui-textarea" rows="5">Bot_Alpha\nBot_Beta\nBot_Gamma\nBot_Delta</textarea>
+      <div class="kahoot-ui-btn-group">
+        <button id="kh-btn-shuffle" class="kahoot-ui-btn">Shuffle</button>
+        <button id="kh-btn-load" class="kahoot-ui-btn">Load Defaults</button>
+      </div>
+    </div>
+
+    <div class="kahoot-ui-section">
+      <label class="kahoot-ui-label">System Log Output</label>
+      <textarea id="kh-status" class="kahoot-ui-textarea" rows="4" readonly>Console overlay active.</textarea>
+      <div class="kahoot-ui-btn-group">
+        <button id="kh-btn-test" class="kahoot-ui-btn">Test Delay Timer</button>
+        <button id="kh-btn-close" class="kahoot-ui-btn" style="background:#e06c75">Close UI</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(uiContainer);
+
+  // 3. Script State and Core System Logic
+  const config = {
+    optionSetQuestionSpeed: 10
+  };
+
+  function logStatus(update) {
+    const statusTextarea = document.getElementById('kh-status');
+    const previousLogs = "\n" + statusTextarea.value;
+    statusTextarea.value = update + previousLogs;
+  }
+
+  function shuffle(array) {
+    let currentIndex = array.length, temporaryValue, randomIndex;
+    while (0 !== currentIndex) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+    }
+    return array;
+  }
+
+  async function checkCurrentSpeed() {
+    const isCurrentSpeed = config.optionSetQuestionSpeed === 10;
+    logStatus(`Checking limits. Active delay: ${config.optionSetQuestionSpeed}s`);
+    
+    if (isCurrentSpeed) {
+      logStatus("Standard interval matched. Starting sleep timer...");
+      await new Promise(resolve => setTimeout(resolve, config.optionSetQuestionSpeed * 1000));
+      logStatus("Timer cycle finished processing.");
+    } else {
+      logStatus("Interval mismatch. Sleep timer bypassed.");
+    }
+    return isCurrentSpeed;
+  }
+
+  // 4. Hook Event Observers
+  document.getElementById('kh-speed-input').addEventListener('input', (e) => {
+    config.optionSetQuestionSpeed = parseInt(e.target.value) || 0;
+    logStatus(`Speed changed to: ${config.optionSetQuestionSpeed}s`);
+  });
+
+  document.getElementById('kh-btn-shuffle').addEventListener('click', () => {
+    const rawNames = document.getElementById('kh-bot-list').value.split('\n');
+    const validNames = rawNames.filter(name => name.trim() !== '');
+    const randomized = shuffle(validNames);
+    document.getElementById('kh-bot-list').value = randomized.join('\n') + '\n';
+    logStatus("Bot list randomized.");
+  });
+
+  document.getElementById('kh-btn-load').addEventListener('click', () => {
+    fetch('./names.txt')
+      .then(res => {
+        if (!res.ok) throw new Error();
+        return res.text();
+      })
+      .then(data => {
+        document.getElementById('kh-bot-list').value = data;
+        logStatus("Loaded default names file.");
+      })
+      .catch(() => {
+        logStatus("Error: names.txt source missing locally.");
+      });
+  });
+
+  document.getElementById('kh-btn-test').addEventListener('click', () => {
+    checkCurrentSpeed();
+  });
+
+  document.getElementById('kh-btn-close').addEventListener('click', () => {
+    uiContainer.remove();
+    styleNode.remove();
+  });
+
+  // 5. Setup Drag Configuration Operations
+  let isDragging = false;
+  let currentX, currentY, initialX, initialY;
+  let xOffset = 0, yOffset = 0;
+  const header = document.getElementById('kahoot-ui-header');
+
+  header.addEventListener('mousedown', dragStart);
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', dragEnd);
+
+  function dragStart(e) {
+    initialX = e.clientX - xOffset;
+    initialY = e.clientY - yOffset;
+    if (e.target === header) isDragging = true;
+  }
+
+  function drag(e) {
+    if (isDragging) {
+      e.preventDefault();
+      currentX = e.clientX - initialX;
+      currentY = e.clientY - initialY;
+      xOffset = currentX;
+      yOffset = currentY;
+      uiContainer.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+    }
+  }
+
+  function dragEnd() {
+    initialX = currentX;
+    initialY = currentY;
+    isDragging = false;
+  }
+})();
