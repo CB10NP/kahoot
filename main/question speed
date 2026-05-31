@@ -1,0 +1,18 @@
+const config = {
+  optionSetQuestionSpeed: 10
+};
+
+async function checkCurrentSpeed() {
+  const isCurrentSpeed = config.optionSetQuestionSpeed === 10;
+  
+  if (isCurrentSpeed) {
+    await new Promise(resolve => setTimeout(resolve, config.optionSetQuestionSpeed * 1000));
+  }
+  
+  return isCurrentSpeed;
+}
+
+module.exports = {
+  config,
+  checkCurrentSpeed
+};
