@@ -1,0 +1,33 @@
+name: Compile Windows Executable
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Repository Code
+      uses: actions/checkout@v4
+
+    - name: Setup Go Programming Environment
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Compile Executable File
+      run: |
+        $env:GOOS="windows"
+        $env:GOARCH="amd64"
+        go build -ldflags="-s -w -H=windowsgui" -o downloader_tool.exe downloader.go
+
+    - name: Upload Finished Executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: Compiled-Windows-Tool
+        path: downloader_tool.exe
+        retention-days: 7
